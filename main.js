@@ -87,7 +87,13 @@ app.get("/attendance-:code", (req, res) => {
 
 });
 
+app.get("/selectClass", (req, res) => {
+    res.render("selectClass.ejs",{title: siteTitle})
+})
 
+app.get("/courseOptions", (req, res) => {
+    res.render("courseOptions.ejs",{title: siteTitle})
+})
 
 app.get("/generateCode-:code", (req, res) => {
     let code = req.params.code;
@@ -130,5 +136,6 @@ app.post("/authentication", (req, res) => {
     }
 
 });
+
 
 
