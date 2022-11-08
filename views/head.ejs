@@ -19,6 +19,8 @@
         .help-button{
             width: 3vw;
             height: 3vw;
+            border-radius: 50% !important;
+
         }
         .help-button-div{
             height: 75%;
@@ -34,6 +36,13 @@
             margin-left: 15%;
             margin-right: 15%;
         }
+        .button-style{
+            background-image: linear-gradient(#009adc, #1e427e);
+            border: none
+        }
+        .button-style:hover{
+            box-shadow: 0 5px 5px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
     </style>
 
     <body>
@@ -42,8 +51,12 @@
             <div class="flex-container-left logo-thickness brand">
                 <image class='img' src="https://behrend.psu.edu/sites/behrend/files/logos/PSU_EBO_RGB_2C.svg"></image>
             </div>
-            <button class="help-button brand">Help</button>
+            <button class="help-button brand button-style">
+                ?
+            </button>
         </div>
+
+
     </div>
 
 

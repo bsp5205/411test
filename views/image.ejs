@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body onload="myFunction()">
+
+<script>
+    function myFunction() {
+        var TextInside = document.getElementById("test").innerHTML;
+        console.log(TextInside)
+        var img = new Image();
+        img.src = TextInside;
+        myDiv = document.getElementById("myDiv");
+        myDiv.appendChild(img)
+    }
+</script>
+<img id="demo">
+<p id="test" style="display: none"><%= url %></p>
+    <div id="myDiv"></div>
+</body>
+</html>
