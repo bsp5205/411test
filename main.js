@@ -92,7 +92,11 @@ app.get("/selectClass", (req, res) => {
 })
 
 app.get("/courseOptions", (req, res) => {
-    res.render("courseOptions.ejs",{title: siteTitle})
+    // console.log("inside /courseOptions");
+    // console.log(req.params.course_id)
+    let test_list = [{student_name: 'TestName1', student_attendance: '2/10'}, {student_name: 'TestName2', student_attendance: '3/10'}]
+
+    res.render("courseOptions.ejs",{title: siteTitle,  student_list: test_list})
 })
 
 app.get("/generateCode-:code", (req, res) => {
@@ -134,6 +138,12 @@ app.post("/authentication", (req, res) => {
         session = req.session;
         session.userid = username;
     }
+
+});
+
+app.get("/getCourses", (req, res) => {
+
+
 
 });
 

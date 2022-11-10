@@ -59,19 +59,29 @@
         box-shadow: 0 5px 5px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
     }
 
-    .social-media2:hover{
-        color:red;
-    }
-
     .social-media{
         display: flex;
         justify-content: center;
     }
 
-    .social-media2{
-        display: flex;
-        justify-content: center;
+    .text-test{
+        opacity: 100;
+        background: red;
     }
+
+    .login-images:hover .text-test{
+        background: blue;
+    }
+
+    .logoDesc{
+        opacity : 0;
+    }
+
+    .logoWrap:hover .logoDesc{
+        opacity:1;
+    }
+
+
 
 
 </style>
@@ -82,13 +92,15 @@
 </head>
 <div>
     <div class="social-media">
-        <img onclick="window.location.href = 'http://localhost:3000/login'" class="login-images" border="0" src="https://behrend.psu.edu/sites/behrend/files/styles/person_headshot/public/wen_li_wang.jpg?itok=_L920Tv1"/>
+        <img onclick="window.location.href = 'http://localhost:3000/login'" class="login-images logoWrap" border="0" src="https://behrend.psu.edu/sites/behrend/files/styles/person_headshot/public/wen_li_wang.jpg?itok=_L920Tv1"/>
         <img onclick="window.location.href = 'http://localhost:3000/student'" class="login-images" src="https://behrend.psu.edu/sites/behrend/files/styles/4_3_thumbnail/public/exploring-majors_0.jpg?itok=hFZVCOga"/>
+        <p class="logoDesc">this is img desc</p>
     </div>
-    <div class="social-media2">
-        <h1>Professor</h1>
-        <h1>Student</h1>
+    <div class="logoWrap">
+        <img src="https://i.imgur.com/OBFbjSK.png"/>
+        <p class="logoDesc">this is img desc</p>
     </div>
+
 </div>
 
 
