@@ -1,5 +1,6 @@
 <%- include('head.ejs') %>
 <!DOCTYPE html>
+
 <html>
 <head>
     <title><%= title %></title>
@@ -27,18 +28,24 @@
         margin: auto;
     }
 
+    .getID{
+
+    }
+
+    .getButtons{
+
+    }
 </style>
-    <body>
-        <!-- -->
-        <h1>Select a course</h1>
-        <div class="classButtons">
-        <% for (i = 0; i < 5; i++){ %><!-- loop that creates the classes based off of buttons -->
-            <p class="center"><button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/courseOptions'"> Course </button></p><!-- Courses[i]['courseID'] -->
-        <% } %>
 
-        </div>
+<h1>Select a course</h1>
+<div class="classButtons">
+    <table>
+        <% for (let i = 0; i < course_list.length; i++) { %>
+            <tr>
+                <td><button class="getButtons" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %></button></td>
+            </tr>
+        <% } %></table>
+</div>
 
-    </body>
-</html>
 
 <%- include('footer.ejs') %>

@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
+
 //normal express app setup
 const express = require('express')
 const path = require("path");
@@ -99,22 +100,40 @@ app.get("/selectClass", (req, res) => {
 })
 
 //this endpoint will query the DB for the specified course and pass a list of students to the front end
-app.get("/courseOptions", (req, res) => {
+app.get("/courseOptions-:course_id", (req, res) => {
+    //get the course id from URL
+    let course_id = req.params.course_id;
+    course_id = course_id.replace(':', '');
+    console.log(course_id);
     //query DB for students in the course using the course_id
 
-    //test_list is filled w/ dummy data to test the table generation
-    let test_list = [{student_name: 'TestName1', student_attendance: '2/10'}, {student_name: 'TestName2', student_attendance: '3/10'}];
 
+    //test_list is filled w/ dummy data to test the table generation
+    let test_list = [];
+    if(course_id === '00001'){
+        test_list = [{student_name: 'TestName1', student_attendance: '2/10'}, {student_name: 'TestName2', student_attendance: '9/10'}];
+    }else if (course_id === '00002'){
+        test_list = [{student_name: 'TestName3', student_attendance: '5/10'}, {student_name: 'TestName4', student_attendance: '0/10'}];
+    }else if (course_id === '00003'){
+        test_list = [{student_name: 'TestName5', student_attendance: '1/10'}, {student_name: 'TestName6', student_attendance: '7/10'}];
+    }
+
+    course_id = course_id.toString()
+
+    let test_list_2 = [{id: course_id}]
     //render the course with the list of students from the DB
-    res.render("courseOptions.ejs",{title: siteTitle,  student_list: test_list})
+    res.render("courseOptions.ejs",{title: siteTitle,  student_list: test_list, course_id_value: test_list_2})
 })
 
 //this endpoint will generate the QR code using the API and then pass the image to the front end
-app.get("/generateCode-:code", (req, res) => {
+app.get("/generateCode-:course_id", (req, res) => {
     if(session){ //check if session is defined - if yes, then the professor is logged in
+        let course_id = req.params.course_id;
 
-        //get the code from the URL
-        let code = req.params.code;
+        //generate the code
+        let code = Math.floor(100000 + Math.random() * 900000)
+
+        //update the course-code DB table with the active code using the course_id passed in the URL
 
         //QR code api call
         const userAction = async () => {
@@ -151,8 +170,11 @@ app.post("/authentication", (req, res) => {
 
         //query the DB and pull a list of the faculty member's courses
 
+        //temp list
+        let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
+
         //render the professor's list of courses
-        res.render("selectClass.ejs",{title: siteTitle});
+        res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
     }else{
         //render the rejection as the login credentials are incorrect
         res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
@@ -162,6 +184,7 @@ app.post("/authentication", (req, res) => {
 app.get("/getCourses", (req, res) => {
 
 });
+
 
 
 
