@@ -1,3 +1,69 @@
+<%- include('head.ejs') %>
+<style>
+    .gradient-custom-2 {
+        background: linear-gradient(to right, #009cde, #001c3f);
+    }
+
+    @media (min-width: 768px) {
+        .gradient-form {
+            height: 100vh !important;
+        }
+    }
+    @media (min-width: 769px) {
+        .gradient-custom-2 {
+            border-top-right-radius: .3rem;
+            border-bottom-right-radius: .3rem;
+        }
+    }
+    .button-style{
+        background-image: linear-gradient(#009adc, #1e427e);
+        border: none
+    }
+
+    .button-style:hover{
+        box-shadow: 0 5px 5px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+
+    button.button {
+        border-radius: .3rem;
+        font-size: 1rem;
+        color: black;
+        border: solid 3px transparent;
+        background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(101deg, #009adc, #1e427e);
+        background-origin: border-box;
+        background-clip: content-box, border-box;
+        box-shadow: 2px 1000px 1px #fff inset;
+    }
+
+    .login-images{
+        width: 30%;
+        border-radius: 5%;
+        object-fit: cover;
+        margin: 2% 1%;
+    }
+    .login-images:hover{
+        box-shadow: 0 5px 5px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+    .social-media{
+        display: flex;
+        justify-content: center;
+    }
+
+
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <h1><%= title %></h1>
-<h2><%= message %></h2>
-<p>You do not have the proper permissions to access this resource</p>
+<div class="text-center pt-1 mb-3">
+    <img src="https://raw.githubusercontent.com/bsp5205/411test/master/public/images/logoNavy.png"
+         style="width: 185px;" alt="logo">
+</div>
+<div class="text-center pt-1 mb-3">
+    <p><b>You do not have the proper permissions to access this resource</b></p>
+</div>
+<div class="text-center pt-1 mb-3">
+    <button class="button-style raise" onclick="window.location.href = 'http://localhost:3000/login'">Login</button>
+</div>
+<div class="text-center pt-1 mb-3">
+    <p><b>If you believe this is an error, please contact your administrator</b></p>
+</div>
+<%- include('footer.ejs') %>

@@ -32,7 +32,7 @@ app.use(sessions({
 }));
 
 var siteTitle = 'LionTrack'
-var tempMessage = 'Adderall goes crazy (part 4)'
+var tempMessage = 'We hope you enjoy our demo :)'
 
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`)
@@ -43,7 +43,7 @@ app.get("/", function(req,res){
 });
 
 app.get("/login", function(req,res){
-    res.render("login");
+    res.render("login.ejs",{title: siteTitle, message: ""})
 });
 
 app.get("/student", function(req,res){
@@ -69,22 +69,13 @@ app.post('/test', (req, res) =>{
     if(parsedEmail === 'bsp5205@psu.edu'){
         res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
     }else{  //if DB not updated, render the page with the !letter and a message saying the attendance update failed
-        res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"You put in an invalid email dumbass..."});
+        res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
     }
 });
 
 app.get("/attendance-:code", (req, res) => {
-    // if(session.userid){
-    //     console.log("inside /attendance");
-    //     console.log(req.params.code)
-    //     res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Passed through attendance - this is a temp render to test the dynamic code"});
-    // }else{
-    //     res.render("rejection", {title:siteTitle, message:"Error"});
-    // }
-    console.log("inside /attendance");
-    console.log(req.params.code)
-    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Passed through attendance - this is a temp render to test the dynamic code"});
-
+    let code = req.params.code;
+    res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage: "The code you entered is"+code});
 });
 
 app.get("/selectClass", (req, res) => {
@@ -100,43 +91,45 @@ app.get("/courseOptions", (req, res) => {
 })
 
 app.get("/generateCode-:code", (req, res) => {
-    let code = req.params.code;
-    let myBinary;
-    const userAction = async () => {
-        const response = await fetch('https://api.qrserver.com/v1/create-qr-code/?data={}&size=200x200'.replace('{}','http://localhost:3000/' + code));
-        if (!response.ok) {
-            throw new Error('Network response was not OK');
+    if(session){
+        let code = req.params.code;
+        let myBinary;
+        const userAction = async () => {
+            const response = await fetch('https://api.qrserver.com/v1/create-qr-code/?data={}&size=200x200'.replace('{}','http://localhost:3000/' + code));
+            if (!response.ok) {
+                throw new Error('Network response was not OK');
+            }
+            //myBinary = await response.text(); //extract binary from the http response
+            //console.log(myBinary);
+            console.log(response)
+            console.log("Sent Binary");
+            res.render("image.ejs", {title:siteTitle, url:response.url});
         }
-        //myBinary = await response.text(); //extract binary from the http response
-        //console.log(myBinary);
-        console.log(response)
-        console.log("Sent Binary");
-        res.render("image.ejs", {title:siteTitle, url:response.url});
-
+        (async() => {
+            await userAction()
+        })()
+    }else{
+        res.render("rejection.ejs", {title:siteTitle});
     }
-
-    (async() => {
-        await userAction()
-    })()
-
-    //res.sendFile(myBinary); //this may work?
-
-    //res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Passed through generateCode - this is a temp render to test QR code API"});
 });
 
 app.post("/authentication", (req, res) => {
 
     //pass in prof login from app
-    let username = req.body.username;
-    let password = req.body.password;
+    let email = req.body.prof_email;
+    let password = req.body.prof_pw;
 
+    console.log(email + password)
     //check that username and password aren't empty
-    if (username && password){
+    if (email === "bsp5205@psu.edu" && password === "test"){
         //query the DB and check if login info matches
 
         //set the session object
         session = req.session;
-        session.userid = username;
+        session.userid = email;
+        res.render("selectClass.ejs",{title: siteTitle})
+    }else{
+        res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"})
     }
 
 });

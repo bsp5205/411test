@@ -40,7 +40,7 @@
         color: white;
     }
     .center-of-page{
-        padding-bottom: 5%;
+        padding-bottom: 10%;
     }
 </style>
 <head>
@@ -61,32 +61,37 @@
                                         <h4 class="mt-1 mb-5 pb-1">Welcome</h4>
                                     </div>
 
-                                    <form>
+                                    <form action="http://localhost:3000/authentication" method="post">
                                         <p>Please login to your account</p>
 
                                         <div class="form-outline mb-4">
-                                            <input type="email" id="form2Example11" class="form-control"
+                                            <input type="email" id="prof_email" name="prof_email" class="form-control"
                                                    placeholder="University email address" />
                                             <label class="form-label" for="form2Example11">Username</label>
                                         </div>
 
                                         <div class="form-outline mb-4">
-                                            <input type="password" id="form2Example22" class="form-control" />
+                                            <input type="password" id="prof_pw" name="prof_pw" class="form-control" />
                                             <label class="form-label" for="form2Example22">Password</label>
                                         </div>
 
-                                        <div class="text-center pt-1 mb-5 pb-1">
-                                            <button class="button-style raise" type="button" onclick="window.location.href = 'http://localhost:3000/selectClass'">Log in</button>
+                                        <div class="text-center pt-1 mb-5">
+                                            <button class="button-style raise" type="submit">Log in</button>
                                             <a class="text-muted" href="#!">Forgot password?</a>
                                         </div>
-
+                                        <div class="text-center">
+                                            <% if (message){%>
+                                                <p style="color: red"><%= message %></p>
+                                            <% }else{%>
+                                                <p></p>
+                                            <%}%>
+                                        </div>
                                         <div class="d-flex align-items-center justify-content-center pb-4">
                                             <p class="mb-0 me-2">Don't have an account?&nbsp</p>
                                             <button class="button">Create</button>
                                         </div>
 
                                     </form>
-
                                 </div>
                             </div>
                             <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
