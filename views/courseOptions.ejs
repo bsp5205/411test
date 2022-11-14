@@ -38,7 +38,6 @@
     function tableToCSV() {
         // Variable to store the final csv data
         var csv_data = [];
-
         // Get each row data
         var rows = document.getElementsByTagName('tr');
         for (var i = 0; i < rows.length; i++) {
@@ -79,32 +78,58 @@
         temp_link.click();
         document.body.removeChild(temp_link);
     }
+
+    function createPDF() {
+        var sTable = document.getElementById('tab').innerHTML;
+
+        var style = "<style>";
+        style = style + "table {width: 100%;font: 17px Calibri;}";
+        style = style + "table, th, td {border: solid 1px #DDD; border-collapse: collapse;";
+        style = style + "padding: 2px 3px;text-align: center;}";
+        style = style + "</style>";
+
+        // CREATE A WINDOW OBJECT.
+        var win = window.open('', '', 'height=700,width=700');
+
+        win.document.write('<html><head>');
+        win.document.write('<title>Attendance</title>');   // <title> FOR PDF HEADER.
+        win.document.write(style);          // ADD STYLE INSIDE THE HEAD TAG.
+        win.document.write('</head>');
+        win.document.write('<body>');
+        win.document.write(sTable);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+        win.document.write('</body></html>');
+
+        win.document.close(); 	// CLOSE THE CURRENT WINDOW.
+
+        win.print();    // PRINT THE CONTENTS.
+    }
 </script>
     <body>
     <h1><%= course_id_value[0].id%></h1>
-        <table>
-            <tr>
-                <td><b>Name</b></td>
-                <td class="student_table"></td>
-                <td class="student_table"></td>
-                <td><b>Attendance Score</b></td>
-            </tr>
-            <% for (var i = 0; i < student_list.length; i++) { %>
+        <div id="tab">
+            <table>
                 <tr>
-                    <td><%= student_list[i].student_name %></td>
+                    <td><b>Name</b></td>
                     <td class="student_table"></td>
                     <td class="student_table"></td>
-                    <td><%= student_list[i].student_attendance %></td>
+                    <td><b>Attendance Score</b></td>
                 </tr>
-            <% } %></table>
-
+                <% for (var i = 0; i < student_list.length; i++) { %>
+                    <tr>
+                        <td><%= student_list[i].student_name %></td>
+                        <td class="student_table"></td>
+                        <td class="student_table"></td>
+                        <td><%= student_list[i].student_attendance %></td>
+                    </tr>
+                <% } %></table>
+        </div>
         <div>
             <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/generateCode-:<%= course_id_value[0].id%>'">Generate QR Code</button>
         </div>
 
         <div>
-            <button class="buttonstyle" onclick="">Generate Attendance Report (.xlsx)</button>
-            <button class="buttonstyle" onclick="">Generate Attendance Report (.pdf)</button>
+            <button class="buttonstyle" onclick="tableToCSV()">Generate Attendance Report (.xlsx)</button>
+            <button class="buttonstyle" onclick="createPDF()">Generate Attendance Report (.pdf)</button>
         </div>
 
     </body>
