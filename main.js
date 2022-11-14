@@ -128,6 +128,7 @@ app.get("/courseOptions-:course_id", (req, res) => {
 //this endpoint will generate the QR code using the API and then pass the image to the front end
 app.get("/generateCode-:course_id", (req, res) => {
     if(session){ //check if session is defined - if yes, then the professor is logged in
+
         let course_id = req.params.course_id;
 
         //generate the code
@@ -143,7 +144,7 @@ app.get("/generateCode-:course_id", (req, res) => {
             }
 
             //render the page with the QR code
-            res.render("image.ejs", {title:siteTitle, url:response.url});
+            res.render("image.ejs", {title:siteTitle, url:response.url, code:code});
         }
         (async() => {
             await userAction();
@@ -154,11 +155,14 @@ app.get("/generateCode-:course_id", (req, res) => {
     }
 });
 
+
+
 //this endpoint is connected to the form in the login page. It gets the info entered, and then will query the DB to check the credentials
 app.post("/authentication", (req, res) => {
     //pass in prof login from app
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
+
     console.log(email + " " + password);
     //check that username and password aren't empty
     if (email === "bsp5205@psu.edu" && password === "test"){

@@ -1,7 +1,14 @@
+<%- include('head.ejs') %>
 <!DOCTYPE html>
 <html>
 <body onload="myFunction()">
-
+<style>
+    .center{
+        margin: auto;
+        display: block;
+        width: 70%;
+    }
+</style>
 <script>
     function myFunction() {
         var TextInside = document.getElementById("test").innerHTML;
@@ -12,8 +19,12 @@
         myDiv.appendChild(img)
     }
 </script>
+<center class="center">
 <img id="demo">
 <p id="test" style="display: none"><%= url %></p>
     <div id="myDiv"></div>
+    <h3><%=code%></h3>
+</center>
 </body>
 </html>
+<%- include('footer.ejs') %>
