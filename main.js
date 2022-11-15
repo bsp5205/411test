@@ -60,6 +60,11 @@ app.get("/student", function(req,res){
     res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
 });
 
+app.get("/studentCode", function(req,res){
+    let x = 5;
+    res.render("studentCode.ejs", {title:siteTitle, code: x})
+})
+
 //landing page endpoint
 app.get("/landing", function(req,res){
     res.render("landing");
