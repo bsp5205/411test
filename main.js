@@ -57,12 +57,12 @@ app.get("/login", function(req,res){
 
 //student endpoint
 app.get("/student", function(req,res){
+
     res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
 });
 
 app.get("/studentCode", function(req,res){
-    let x = 5;
-    res.render("studentCode.ejs", {title:siteTitle, code: x})
+    res.render("studentCode.ejs", {title:siteTitle, wrong:""})
 })
 
 //landing page endpoint
@@ -70,6 +70,15 @@ app.get("/landing", function(req,res){
     res.render("landing");
 });
 
+app.post("/codeTest", function(req,res){
+    var parsedCode = req.body.codeTest;
+    console.log(parsedCode);
+    if(parsedCode == 5){
+        res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
+    }else{
+        res.render("studentCode.ejs", {title: siteTitle, wrong:"The code you have entered is invalid"})
+    }
+})
 //this endpoint is connected to the form in the attendance page. It gets the student email, checks if it is in the course DB, and then updates the attendance
 app.post('/test', (req, res) =>{
     //get the email from the form

@@ -30,15 +30,18 @@
     </p>
     <div class="flex-container">
         <div class="size">
-            <form action="http://localhost:3000/student" method="get">
+            <form action="http://localhost:3000/codeTest" method="post">
                 <p>Please Enter a code</p>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                     </div>
-                    <input type="number" id="emailTest" name="emailTest" class="form-control" placeholder="Class Code" aria-label="Username" aria-describedby="basic-addon1" required>
+                    <input type="number" id="codeTest" name="codeTest" class="form-control" placeholder="Class Code" aria-label="Username" aria-describedby="basic-addon1" required>
                     <button type="submit" class="button-style">Submit</button>
                 </div>
             </form>
+            <% if (wrong !== ""){%>
+                <p><%= wrong %></p>
+            <% }%>
         </div>
     </div>
     </body>
