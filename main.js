@@ -219,7 +219,7 @@ app.post("/create_prof_account", (req, res) => {
             // if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
 
             //get the list of courses associated w/ the access token
-            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
+            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '')
             fetch(courses_url)
                 .then(response => response.json())
                 .then(data => {
@@ -230,7 +230,7 @@ app.post("/create_prof_account", (req, res) => {
             //get a list of professor courses from the DB using the professor's email
 
             //use the list of courses (id will be there) to pull a list of students
-            // let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
+            // let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','')
             // fetch(student_list_url).then(response => response.json())
             //     .then(data => {
             //         //fill course tables here
