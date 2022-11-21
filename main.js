@@ -202,6 +202,7 @@ app.get("/create", (req, res) => {
     res.render("create.ejs",{title: siteTitle, message: ""});
 });
 
+//end point that creates the accout for the professor
 app.post("/create_prof_account", (req, res) => {
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
@@ -213,7 +214,9 @@ app.post("/create_prof_account", (req, res) => {
     // console.log(password_confirm);
     // console.log(access_token);
 
+    //if the values are defined
     if(email && password && password_confirm){
+        //if the passwords are the same
         if(password === password_confirm){
             //query DB to check if email is already linked to an account
             // if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
@@ -238,13 +241,16 @@ app.post("/create_prof_account", (req, res) => {
             //     });
 
         }else{
+            //render the creation page if the passwords don't match
             res.render("create.ejs",{title: siteTitle, message: "Passwords do not match"});
         }
     }else{
+        //render the creation page if the passwords don't match
         res.render("create.ejs",{title: siteTitle, message: "Missing information"});
     }
 });
 
+//allows prof to manually update the courses
 app.get("/updateCourses", (req, res) => {
     // get list of prof courses from DB
 

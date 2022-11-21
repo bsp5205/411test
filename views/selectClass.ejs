@@ -45,10 +45,10 @@
         <table>
             <% for (let i = 0; i < course_list.length; i++) { %>
                 <tr>
-                    <td><button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %></button></td>
+                    <td><button class="button-style raise" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %></button></td>
                 </tr>
             <% } %></table>
-        <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
+        <button class="button-style raise" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
     </div>
 </div>
 
