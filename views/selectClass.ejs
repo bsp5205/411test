@@ -24,6 +24,9 @@
         display: table;
         margin: 0 auto;
     }
+    .center-of-page{
+        padding-bottom: 10%;
+    }
     .center {
         margin: auto;
     }
@@ -36,17 +39,19 @@
 
     }
 </style>
-
-<h1>Select a course</h1>
-<div class="classButtons">
-    <table>
-        <% for (let i = 0; i < course_list.length; i++) { %>
-            <tr>
-                <td><button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %></button></td>
-            </tr>
-        <% } %></table>
-    <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
+<div class="center-of-page">
+    <h1>Select a course</h1>
+    <div class="classButtons">
+        <table>
+            <% for (let i = 0; i < course_list.length; i++) { %>
+                <tr>
+                    <td><button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %></button></td>
+                </tr>
+            <% } %></table>
+        <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
+    </div>
 </div>
+
 
 
 <%- include('footer.ejs') %>

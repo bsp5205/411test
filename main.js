@@ -219,13 +219,13 @@ app.post("/create_prof_account", (req, res) => {
             // if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
 
             //get the list of courses associated w/ the access token
-            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '')
-            fetch(courses_url)
-                .then(response => response.json())
-                .then(data => {
-                    //create a table with (PK = (email, course id))
-                    //create a table for each course (PK = course ID, student name, attendance score)
-                });
+            // let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '')
+            // fetch(courses_url)
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         //create a table with (PK = (email, course id))
+            //         //create a table for each course (PK = course ID, student name, attendance score)
+            //     });
 
             //get a list of professor courses from the DB using the professor's email
 
@@ -244,7 +244,6 @@ app.post("/create_prof_account", (req, res) => {
         res.render("create.ejs",{title: siteTitle, message: "Missing information"});
     }
 });
-
 
 app.get("/updateCourses", (req, res) => {
     // get list of prof courses from DB
