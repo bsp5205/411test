@@ -37,21 +37,28 @@
 <script>
     function tableToCSV() {
         // Variable to store the final csv data
-        var csv_data = [];
+        let csv_data = [];
         // Get each row data
-        var rows = document.getElementsByTagName('tr');
+        let rows = document.getElementsByTagName('tr');
         for (var i = 0; i < rows.length; i++) {
             // Get each column data
-            var cols = rows[i].querySelectorAll('td,th');
+            let cols = rows[i].querySelectorAll('td,th');
             // Stores each csv row data
-            var csvrow = [];
-            for (var j = 0; j < cols.length; j++) {
-                // Get the text data of each cell of
-                // a row and push it to csvrow
-                csvrow.push(cols[j].innerHTML);
+            let csv_row = [];
+            for (let j = 0; j < cols.length; j++) {
+                // Get the text data of each cell of a row and push it to csv row
+                if(cols[j].innerHTML.includes('<b>')){
+                    csv_row.push(cols[j].innerHTML.replace('<b>','').replace('</b>',''));
+                }else if(cols[j].innerHTML !== ''){
+                    if(cols[j].innerHTML.includes('/')){
+                        csv_row.push(cols[j].innerHTML.replace('/','//'))
+                    }else{
+                        csv_row.push(cols[j].innerHTML)
+                    }
+                }
             }
             // Combine each column value with comma
-            csv_data.push(csvrow.join(","));
+            csv_data.push(csv_row.join(","));
         }
         // combine each row data with new line character
         csv_data = csv_data.join('\n');
@@ -66,7 +73,8 @@
         var temp_link = document.createElement('a');
 
         // Download csv file
-        temp_link.download = "GfG.csv";
+        let id = document.getElementById('getCode').innerText
+        temp_link.download = id + '.csv';
         var url = window.URL.createObjectURL(CSVFile);
         temp_link.href = url;
 
@@ -91,10 +99,10 @@
         // CREATE A WINDOW OBJECT.
         var win = window.open('', '', 'height=700,width=700');
 
-        win.document.write('<html><head>');
+        win.document.write('<html><head><b>');
         win.document.write('<title>Attendance</title>');   // <title> FOR PDF HEADER.
         win.document.write(style);          // ADD STYLE INSIDE THE HEAD TAG.
-        win.document.write('</head>');
+        win.document.write('</b></head>');
         win.document.write('<body>');
         win.document.write(sTable);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
         win.document.write('</body></html>');
@@ -105,7 +113,7 @@
     }
 </script>
     <body>
-    <h1><%= course_id_value[0].id%></h1>
+    <h1 id="getCode"><%= course_id_value[0].id %></h1>
         <div id="tab">
             <table>
                 <tr>
@@ -124,7 +132,7 @@
                 <% } %></table>
         </div>
         <div>
-            <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/generateCode-:<%= course_id_value[0].id%>'">Generate QR Code</button>
+            <button class="buttonstyle" onclick="window.location.href = 'http://localhost:3000/generateCode-:<%= course_id_value[0].id %>'">Generate QR Code</button>
         </div>
 
         <div>

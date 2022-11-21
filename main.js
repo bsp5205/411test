@@ -19,6 +19,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 //imports
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import {response} from "express";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -169,8 +170,6 @@ app.get("/generateCode-:course_id", (req, res) => {
     }
 });
 
-
-
 //this endpoint is connected to the form in the login page. It gets the info entered, and then will query the DB to check the credentials
 app.post("/authentication", (req, res) => {
     //pass in prof login from app
@@ -199,10 +198,60 @@ app.post("/authentication", (req, res) => {
     }
 });
 
-app.get("/getCourses", (req, res) => {
+app.get("/create", (req, res) => {
+    res.render("create.ejs",{title: siteTitle, message: ""});
+});
 
+app.post("/create_prof_account", (req, res) => {
+    let email = req.body.prof_email;
+    let password = req.body.prof_pw;
+    let password_confirm = req.body.prof_pw_confirm;
+    let access_token = req.body.prof_access_token;
+
+    // console.log(email);
+    // console.log(password);
+    // console.log(password_confirm);
+    // console.log(access_token);
+
+    if(email && password && password_confirm){
+        if(password === password_confirm){
+            //query DB to check if email is already linked to an account
+            // if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
+
+            //get the list of courses associated w/ the access token
+            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
+            fetch(courses_url)
+                .then(response => response.json())
+                .then(data => {
+                    //create a table with (PK = (email, course id))
+                    //create a table for each course (PK = course ID, student name, attendance score)
+                });
+
+            //get a list of professor courses from the DB using the professor's email
+
+            //use the list of courses (id will be there) to pull a list of students
+            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
+            fetch(student_list_url).then(response => response.json())
+                .then(data => {
+                    //fill course tables here
+                    console.log(data)
+                });
+
+        }else{
+            res.render("create.ejs",{title: siteTitle, message: "Passwords do not match"});
+        }
+    }else{
+        res.render("create.ejs",{title: siteTitle, message: "Missing information"});
+    }
 });
 
 
+app.get("/updateCourses", (req, res) => {
+    // get list of prof courses from DB
 
+    // use the canvas API to pull a list of students from each course
 
+    // temp list
+    let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
+    res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
+});

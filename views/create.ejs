@@ -61,18 +61,28 @@
                                         <h4 class="mt-1 mb-5 pb-1">Welcome</h4>
                                     </div>
 
-                                    <form action="http://localhost:3000/authentication" method="post">
-                                        <p>Please login to your account</p>
+                                    <form action="http://localhost:3000/create_prof_account" method="post">
+                                        <p>Please create your account</p>
 
-                                        <div class="form-outline mb-4">
+                                        <div class="form-outline mb-1">
                                             <input type="email" id="prof_email" name="prof_email" class="form-control"
                                                    placeholder="University email address" />
                                             <label class="form-label" for="form2Example11">Username</label>
                                         </div>
 
-                                        <div class="form-outline mb-4">
+                                        <div class="form-outline mb-1">
                                             <input type="password" id="prof_pw" name="prof_pw" class="form-control" />
                                             <label class="form-label" for="form2Example22">Password</label>
+                                        </div>
+
+                                        <div class="form-outline mb-1">
+                                            <input type="password" id="prof_pw_confirm" name="prof_pw_confirm" class="form-control" />
+                                            <label class="form-label" for="form2Example22">Confirm Password</label>
+                                        </div>
+
+                                        <div class="form-outline mb-1">
+                                            <input type="password" id="prof_access_token" name="prof_access_token" class="form-control" />
+                                            <label class="form-label" for="form2Example22">Canvas Access Token</label>
                                         </div>
 
                                         <div class="text-center pt-1 mb-5">
@@ -87,10 +97,6 @@
                                             <%}%>
                                         </div>
                                     </form>
-                                    <div class="d-flex align-items-center justify-content-center pb-4">
-                                        <p class="mb-0 me-2">Don't have an account?&nbsp</p>
-                                        <button class="button" onclick="window.location.href = 'http://localhost:3000/create'">Create</button>
-                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
