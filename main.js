@@ -230,12 +230,12 @@ app.post("/create_prof_account", (req, res) => {
             //get a list of professor courses from the DB using the professor's email
 
             //use the list of courses (id will be there) to pull a list of students
-            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
-            fetch(student_list_url).then(response => response.json())
-                .then(data => {
-                    //fill course tables here
-                    console.log(data)
-                });
+            // let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','1050~GBIN59x1sBKpFavezbGrynevovREB5ocpAoKOUYApYuilYA1oxk7ris3Q8KID5GK')
+            // fetch(student_list_url).then(response => response.json())
+            //     .then(data => {
+            //         //fill course tables here
+            //         console.log(data)
+            //     });
 
         }else{
             res.render("create.ejs",{title: siteTitle, message: "Passwords do not match"});
