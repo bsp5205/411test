@@ -207,8 +207,9 @@ app.post("/create_prof_account", (req, res) => {
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
     let password_confirm = req.body.prof_pw_confirm;
-    let access_token = req.body.prof_access_token;
-
+    // let access_token = req.body.prof_access_token;
+    let access_token = ''
+    let current_term = '202223FA'
     // console.log(email);
     // console.log(password);
     // console.log(password_confirm);
@@ -219,26 +220,46 @@ app.post("/create_prof_account", (req, res) => {
         //if the passwords are the same
         if(password === password_confirm){
             //query DB to check if email is already linked to an account
-            // if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
+            //if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
 
             //get the list of courses associated w/ the access token
-            // let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100'.replace('{}', '')
-            // fetch(courses_url)
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         //create a table with (PK = (email, course id))
-            //         //create a table for each course (PK = course ID, student name, attendance score)
-            //     });
+            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
+            const response = fetch(courses_url)
+                .then(response => response.json())
+                .then(data => {
+                    //create a table with (PK = (email, course id))
+                    //create a table for each course (PK = course ID, student name, attendance score)
+
+                    //parse course data
+                    for(let course = 0; course < data.length; course++){
+                        if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
+                            console.log('---------- course:',course,'----------')
+                            console.log(data[course]['id'])
+                            console.log(data[course]['name'])
+                            console.log(data[course]['term']['name'])
+                            console.log('')
+                        }
+                    }
+
+                });
 
             //get a list of professor courses from the DB using the professor's email
 
             //use the list of courses (id will be there) to pull a list of students
-            // let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}?access_token={}&per_page=100'.replace('{}', data[i].id).replace('{}','')
-            // fetch(student_list_url).then(response => response.json())
-            //     .then(data => {
-            //         //fill course tables here
-            //         console.log(data)
-            //     });
+            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
+            fetch(student_list_url).then(response => response.json())
+                .then(data => {
+
+                    //parse student data
+                    for(let student = 0; student < data.length; student++){
+                        if(data[student]['id'] && data[student]['name']){
+                            console.log('\t---------- student:',student,'----------')
+                            console.log('\t',data[student]['id'])
+                            console.log('\t',data[student]['name'])
+                            console.log('')
+                        }
+                    }
+                });
 
         }else{
             //render the creation page if the passwords don't match
