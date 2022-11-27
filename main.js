@@ -80,6 +80,21 @@ app.post("/codeTest", function(req,res){
         res.render("studentCode.ejs", {title: siteTitle, wrong:"The code you have entered is invalid"})
     }
 })
+
+//database connection
+var con = mysql.createConnection({
+    host     : 'liontrack-db.ca47foqbcglj.us-east-2.rds.amazonaws.com',
+    port     : '3306',
+    user     : 'admin',
+    password : 'password',
+    database : 'liontrack-db'
+});
+  
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
+
 //this endpoint is connected to the form in the attendance page. It gets the student email, checks if it is in the course DB, and then updates the attendance
 app.post('/test', (req, res) =>{
     //get the email from the form
