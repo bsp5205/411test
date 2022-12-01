@@ -3,9 +3,9 @@ import fetch from "node-fetch";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
-
 //normal express app setup
-const express = require('express')
+const express = require('express');
+const mysql = require('mysql');
 const path = require("path");
 const sessions = require('express-session');
 
@@ -82,12 +82,11 @@ app.post("/codeTest", function(req,res){
 })
 
 //database connection
-var con = mysql.createConnection({
+const con = mysql.createConnection({
     host     : 'liontrack-db.ca47foqbcglj.us-east-2.rds.amazonaws.com',
     port     : '3306',
     user     : 'admin',
-    password : 'password',
-    database : 'liontrack-db'
+    password : 'password'
 });
   
 con.connect(function(err) {
@@ -100,20 +99,22 @@ app.post('/test', (req, res) =>{
     //get the email from the form
     var parsedEmail = req.body.emailTest;
 
-    //do DB query - this if statement is temporary
-    if(parsedEmail.endsWith('.psu.edu') ){
-        //do database query to get list of valid emails
-        console.log('Getting list of students associated with the class that has generated the code');
-    }
+    con.query('SELECT * FROM sys.temp_table WHERE email = ?', [parsedEmail], function(error, results, fields){
+        if (error) throw error
+        if (results.length > 0){
+            // console.log(results[0]['email'], results[0]['attendance'])
+            con.query('UPDATE sys.temp_table set attendance = ? WHERE email = ?', [results[0]['attendance'] + 1, results[0]['email']], function(error, update_results, fields){
+                if (error) throw error
+                console.log('Updated', update_results.affectedRows, 'rows')
+                if (update_results.affectedRows > 0){
+                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
+                }else{
+                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
+                }
+            })
+        }
+    })
 
-    //if parsed email matches email returned from the DB query, update the database and display the success message/email logo
-    if(parsedEmail === 'bsp5205@psu.edu'){
-        //render the page w/ success message
-        res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
-    }else{  //if DB not updated, render the page with the !letter and a message saying the attendance update failed
-        //render the page w/ failure message
-        res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
-    }
 });
 
 //this is the endpoint which will be requested by the student when the QR code is scanned
@@ -136,7 +137,6 @@ app.get("/courseOptions-:course_id", (req, res) => {
     course_id = course_id.replace(':', '');
     console.log(course_id);
     //query DB for students in the course using the course_id
-
 
     //test_list is filled w/ dummy data to test the table generation
     let test_list = [];
@@ -217,7 +217,7 @@ app.get("/create", (req, res) => {
     res.render("create.ejs",{title: siteTitle, message: ""});
 });
 
-//end point that creates the accout for the professor
+//end point that creates the account for the professor
 app.post("/create_prof_account", (req, res) => {
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
@@ -236,7 +236,14 @@ app.post("/create_prof_account", (req, res) => {
         if(password === password_confirm){
             //query DB to check if email is already linked to an account
             //if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
+            con.query('SELECT * FROM sys.professor WHERE email = ?', [email], function(error, results, fields){
+                if (error) throw error
+                if (results.length === 0) {
+                    con.query('INSERT INTO professor (professor_email, professor_password) VALUES (?,?)', [email, password])
+                    //render a page that accepts a canvas access token here
 
+                }
+            })
             //get the list of courses associated w/ the access token
             let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
             const response = fetch(courses_url)
