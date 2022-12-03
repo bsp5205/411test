@@ -42,6 +42,8 @@ app.use(sessions({
 var siteTitle = 'LionTrack';
 var tempMessage = 'We hope you enjoy our demo :)';
 
+var access_token = "";
+
 //added here for ease of use (click the link in the console)
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
@@ -59,7 +61,6 @@ app.get("/login", function(req,res){
 
 //student endpoint
 app.get("/student", function(req,res){
-
     res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
 });
 
@@ -103,11 +104,11 @@ app.post('/test', (req, res) =>{
     con.query('SELECT * FROM sys.temp_table WHERE email = ?', [parsedEmail], function(error, results, fields){
         if (error) throw error
         if (results.length > 0){
-            // console.log(results[0]['email'], results[0]['attendance'])
             con.query('UPDATE sys.temp_table set attendance = ? WHERE email = ?', [results[0]['attendance'] + 1, results[0]['email']], function(error, update_results, fields){
                 if (error) throw error
                 console.log('Updated', update_results.affectedRows, 'rows')
                 if (update_results.affectedRows > 0){
+                    let msg = "Your attendance has been updated to: " + String(results[0]['attendance'] + 1)
                     res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
                 }else{
                     res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
@@ -233,24 +234,7 @@ app.post("/authentication", (req, res) => {
     } else{
         res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
     }
-    //if (email === "bsp5205@psu.edu" && password === "test"){
-        //query the DB and check if login info matches
 
-        //set the session object
-    //    session = req.session;
-    //    session.userid = email;
-
-        //query the DB and pull a list of the faculty member's courses
-
-        //temp list
-    //    let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
-
-        //render the professor's list of courses
-    //    res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
-    //}else{
-        //render the rejection as the login credentials are incorrect
-    //    res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
-    //}
 });
 
 app.get("/create", (req, res) => {
@@ -262,14 +246,7 @@ app.post("/create_prof_account", (req, res) => {
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
     let password_confirm = req.body.prof_pw_confirm;
-    // let access_token = req.body.prof_access_token;
-    let access_token = ''
     let current_term = '202223FA'
-    // console.log(email);
-    // console.log(password);
-    // console.log(password_confirm);
-    // console.log(access_token);
-
     //if the values are defined
     if(email && password && password_confirm){
         //if the passwords are the same
@@ -281,48 +258,9 @@ app.post("/create_prof_account", (req, res) => {
                 if (results.length === 0) {
                     con.query('INSERT INTO professor (professor_email, professor_password) VALUES (?,?)', [email, password])
                     //render a page that accepts a canvas access token here
-
+                    res.render("accessToken.ejs",{title: siteTitle, course_list: input});
                 }
             })
-            //get the list of courses associated w/ the access token
-            let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
-            const response = fetch(courses_url)
-                .then(response => response.json())
-                .then(data => {
-                    //create a table with (PK = (email, course id))
-                    //create a table for each course (PK = course ID, student name, attendance score)
-
-                    //parse course data
-                    for(let course = 0; course < data.length; course++){
-                        if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
-                            console.log('---------- course:',course,'----------')
-                            console.log(data[course]['id'])
-                            console.log(data[course]['name'])
-                            console.log(data[course]['term']['name'])
-                            console.log('')
-                        }
-                    }
-
-                });
-
-            //get a list of professor courses from the DB using the professor's email
-
-            //use the list of courses (id will be there) to pull a list of students
-            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
-            fetch(student_list_url).then(response => response.json())
-                .then(data => {
-
-                    //parse student data
-                    for(let student = 0; student < data.length; student++){
-                        if(data[student]['id'] && data[student]['name']){
-                            console.log('\t---------- student:',student,'----------')
-                            console.log('\t',data[student]['id'])
-                            console.log('\t',data[student]['name'])
-                            console.log('')
-                        }
-                    }
-                });
-
         }else{
             //render the creation page if the passwords don't match
             res.render("create.ejs",{title: siteTitle, message: "Passwords do not match"});
@@ -343,3 +281,50 @@ app.get("/updateCourses", (req, res) => {
     let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
     res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
 });
+
+app.get("/AccessToken", (req, res) => {
+    res.render("accessToken.ejs",{title: siteTitle});
+});
+
+app.post("/takeAccessToken", (req, res)=>{
+    access_token = req.body.access_token
+    //get the list of courses associated w/ the access token
+    let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
+    const response = fetch(courses_url)
+        .then(response => response.json())
+        .then(data => {
+            //create a table with (PK = (email, course id))
+            //create a table for each course (PK = course ID, student name, attendance score)
+
+            //parse course data
+            for(let course = 0; course < data.length; course++){
+                if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
+                    console.log('---------- course:',course,'----------')
+                    console.log(data[course]['id'])
+                    console.log(data[course]['name'])
+                    console.log(data[course]['term']['name'])
+                    console.log('')
+                }
+            }
+
+        });
+
+    //get a list of professor courses from the DB using the professor's email
+
+    //use the list of courses (id will be there) to pull a list of students
+    let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
+    fetch(student_list_url).then(response => response.json())
+        .then(data => {
+
+            //parse student data
+            for(let student = 0; student < data.length; student++){
+                if(data[student]['id'] && data[student]['name']){
+                    console.log('\t---------- student:',student,'----------')
+                    console.log('\t',data[student]['id'])
+                    console.log('\t',data[student]['name'])
+                    console.log('')
+                }
+            }
+        });
+
+})
