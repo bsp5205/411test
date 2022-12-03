@@ -193,24 +193,52 @@ app.post("/authentication", (req, res) => {
 
     console.log(email + " " + password);
     //check that username and password aren't empty
-    if (email === "bsp5205@psu.edu" && password === "test"){
+    if (email && password){//if an email and password are entered query for email in the DB
+        con.query('SELECT * FROM sys.professor WHERE professor_email = ?', [email], function(error, results, fields){
+            if (error) throw error
+            console.log(results)
+            if (results.length > 0){//if the DB returns anything
+                if (results[0]['professor_password'] === password){//check if passwords match then query for courses
+                    session = req.session;
+                    session.userid = email;
+                    con.query('SELECT * FROM sys.course_test WHERE professor_id =?', [results[0]['professor_id']], function(error, result, fields){
+                        console.log(result)
+                        let input = [];//set empty array
+                        for (let i = 0; i < result.length; i++){//for loop to generate all items in the list of courses
+                            let test =  {course_name: result[i]['course_name'], course_id: result[i]['course_id'], section_number: result[i]['section_number']};
+                            input.push(test)
+                        }
+                        console.log(input)//render new page
+                        res.render("selectClass.ejs",{title: siteTitle, course_list: input});
+                    })
+                }else{
+                    res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
+                }
+            }else{
+                res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
+            }
+        })
+    } else{
+        res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
+    }
+    //if (email === "bsp5205@psu.edu" && password === "test"){
         //query the DB and check if login info matches
 
         //set the session object
-        session = req.session;
-        session.userid = email;
+    //    session = req.session;
+    //    session.userid = email;
 
         //query the DB and pull a list of the faculty member's courses
 
         //temp list
-        let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
+    //    let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
 
         //render the professor's list of courses
-        res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
-    }else{
+    //    res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
+    //}else{
         //render the rejection as the login credentials are incorrect
-        res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
-    }
+    //    res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
+    //}
 });
 
 app.get("/create", (req, res) => {
