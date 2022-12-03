@@ -20,6 +20,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import {response} from "express";
+import { config } from "process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -160,10 +161,21 @@ app.get("/generateCode-:course_id", (req, res) => {
     if(session){ //check if session is defined - if yes, then the professor is logged in
 
         let course_id = req.params.course_id;
-
+        let code = Math.floor(100000 + Math.random() * 900000);
         //generate the code
-        let code = Math.floor(100000 + Math.random() * 900000)
-
+        console.log("code = " + code)
+        course_id = course_id.replace(':', '')
+        let temp = parseInt(course_id, 10)
+        console.log("course_id = "+ (temp + 1))
+        con.query('SELECT * FROM sys.course_code where course_id = ?',[temp], function(error, courses, fields){
+            if(error) throw error
+            console.log("courses ")
+            console.log(courses)
+            con.query('UPDATE sys.course_code SET code =? WHERE course_id =?', [code, course_id], function(err, test){
+                console.log("test ")
+                console.log(test)
+            })
+        })
         //update the course-code DB table with the active code using the course_id passed in the URL
 
         //QR code api call
