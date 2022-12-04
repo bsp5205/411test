@@ -43,6 +43,7 @@ var siteTitle = 'LionTrack';
 var tempMessage = 'We hope you enjoy our demo :)';
 
 var access_token = "";
+var current_term = '202223FA'
 
 //added here for ease of use (click the link in the console)
 app.listen(port, () => {
@@ -76,6 +77,10 @@ app.get("/landing", function(req,res){
 app.post("/codeTest", function(req,res){
     var parsedCode = req.body.codeTest;
     console.log(parsedCode);
+    // con.query('SELECT * FROM sys.course_code where course_id = ?',[temp], function(error, results, fields){
+    //     if(error) throw error
+    //
+    // })
     if(parsedCode == 5){
         res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
     }else{
@@ -116,14 +121,12 @@ app.post('/test', (req, res) =>{
             })
         }
     })
-
 });
 
 //this is the endpoint which will be requested by the student when the QR code is scanned
 app.get("/attendance-:code", (req, res) => {
     //get the code passed in the URL
-    let code = req.params.code;
-
+    let code = req.params.code
     //render the page with the code (for testing/demo)
     res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage: "The code you entered is"+code});
 });
@@ -136,6 +139,7 @@ app.get("/selectClass", (req, res) => {
 app.get("/courseOptions-:course_id", (req, res) => {
     //get the course id from URL
     let course_id = req.params.course_id;
+    session.current_course_id = req.params.course_id
     course_id = course_id.replace(':', '');
     console.log(course_id);
     //query DB for students in the course using the course_id
@@ -160,9 +164,9 @@ app.get("/courseOptions-:course_id", (req, res) => {
 //this endpoint will generate the QR code using the API and then pass the image to the front end
 app.get("/generateCode-:course_id", (req, res) => {
     if(session){ //check if session is defined - if yes, then the professor is logged in
-
         let course_id = req.params.course_id;
         let code = Math.floor(100000 + Math.random() * 900000);
+
         //generate the code
         console.log("code = " + code)
         course_id = course_id.replace(':', '')
@@ -214,7 +218,7 @@ app.post("/authentication", (req, res) => {
                 if (results[0]['professor_password'] === password){//check if passwords match then query for courses
                     session = req.session;
                     session.userid = email;
-                    con.query('SELECT * FROM sys.course_test WHERE professor_id =?', [results[0]['professor_id']], function(error, result, fields){
+                    con.query('SELECT * FROM sys.course WHERE professor_email =?', [email], function(error, result, fields){
                         console.log(result)
                         let input = [];//set empty array
                         for (let i = 0; i < result.length; i++){//for loop to generate all items in the list of courses
@@ -224,6 +228,7 @@ app.post("/authentication", (req, res) => {
                         console.log(input)//render new page
                         res.render("selectClass.ejs",{title: siteTitle, course_list: input});
                     })
+
                 }else{
                     res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
                 }
@@ -234,7 +239,6 @@ app.post("/authentication", (req, res) => {
     } else{
         res.render("login.ejs",{title: siteTitle, message: "Incorrect credentials"});
     }
-
 });
 
 app.get("/create", (req, res) => {
@@ -246,19 +250,75 @@ app.post("/create_prof_account", (req, res) => {
     let email = req.body.prof_email;
     let password = req.body.prof_pw;
     let password_confirm = req.body.prof_pw_confirm;
-    let current_term = '202223FA'
+    let access_token = req.body.prof_access_token;
+    console.log(access_token)
     //if the values are defined
     if(email && password && password_confirm){
         //if the passwords are the same
         if(password === password_confirm){
             //query DB to check if email is already linked to an account
             //if there is not an account, then add it into the DB 'professor table' (PK = professor email, password, and access token)
-            con.query('SELECT * FROM sys.professor WHERE email = ?', [email], function(error, results, fields){
+            con.query('SELECT * FROM sys.professor WHERE professor_email = ?', [email], function(error, results, fields){
                 if (error) throw error
                 if (results.length === 0) {
-                    con.query('INSERT INTO professor (professor_email, professor_password) VALUES (?,?)', [email, password])
+                    con.query('INSERT INTO sys.professor (professor_email, professor_password, access_token) VALUES (?,?,?)', [email, password, access_token])
                     //render a page that accepts a canvas access token here
-                    res.render("accessToken.ejs",{title: siteTitle, course_list: input});
+                    //res.render("accessToken.ejs",{title: siteTitle});
+                    let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
+                    const response = fetch(courses_url)
+                        .then(response => response.json())
+                        .then(data => {
+                            //parse course data
+                            for(let course = 0; course < data.length; course++){
+                                if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
+                                    //create course tables here
+                                    // console.log(data[course]['id'])
+                                    // console.log(data[course]['name'])
+                                    let table_name = 'sys.course_' + String(data[course]['id'])
+                                    con.query("CREATE TABLE ?? (course_id INT PRIMARY KEY, student_id, student_email VARCHAR(255), student_name VARCHAR(255))", [table_name], function (err, result) {
+                                        if (err) throw err;
+                                        console.log("Course table created with name: ", table_name);
+                                    });
+
+                                    // con.query('INSERT INTO ?? (course_id, course_name, prof_email) VALUES (?, ?, ?)', [table_name, data[course]['id'], data[course]['name'], email])
+                                    con.query('INSERT INTO sys.course (course_id, prof_email, course_name, section_number) VALUES (?, ?, ?, ?)', [data[course]['id'], email,  data[course]['name'], 0])
+
+                                }
+                            }
+                        });
+                    con.query('SELECT * FROM sys.course WHERE prof_email = ?',[email], function(error, results, fields){
+                        if(error) throw error
+                        for(let i = 0; i < results.length; i++){
+                            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', results[i]['course_id']).replace('{}', access_token)
+                            fetch(student_list_url).then(response => response.json())
+                                .then(data2 => {
+                                    //add the student data into each table
+                                    for (let j = 0; j < data2.length; j++){
+                                        let table_name = 'sys.course_' + String(results[i]['course_id'])
+                                        con.query('INSERT INTO ?? (course_id, student_id) VALUES (?, ?)', [table_name, results[i]['course_id'], data2[j]['id']])
+                                    }
+                                });
+                        }
+                    })
+
+                    //get student emails using canvas profile api and student id
+                    // con.query('SELECT * FROM sys.course WHERE prof_email = ?',[email], function(error, results2, fields){
+                    //     if(error) throw error
+                    //     for(let i = 0; i < results2.length; i++){
+                    //         let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', results2[i]['course_id']).replace('{}', access_token)
+                    //         fetch(student_list_url).then(response => response.json())
+                    //             .then(data3 => {
+                    //                 //add the student data into each table
+                    //                 for (let j = 0; j < data3.length; j++){
+                    //                     let table_name = 'sys.course_' + String(results2[i]['course_id'])
+                    //                     con.query('UPDATE ?? SET student_email = ? WHERE student_id = ?', [table_name, data3[j]['email'], results2[i]['student_id']], function(err, test){
+                    //                         console.log("test")
+                    //                         console.log(test)
+                    //                     })
+                    //                 }
+                    //             });
+                    //     }
+                    // })
                 }
             })
         }else{
@@ -274,7 +334,11 @@ app.post("/create_prof_account", (req, res) => {
 //allows prof to manually update the courses
 app.get("/updateCourses", (req, res) => {
     // get list of prof courses from DB
-
+    if(session.userid){
+        con.query('SELECT * FROM sys.professor WHERE professor_email = session.userid', function(error, results, fields){
+            if (error) throw error;
+        });
+    }
     // use the canvas API to pull a list of students from each course
 
     // temp list
@@ -282,49 +346,31 @@ app.get("/updateCourses", (req, res) => {
     res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
 });
 
-app.get("/AccessToken", (req, res) => {
-    res.render("accessToken.ejs",{title: siteTitle});
-});
+// app.get("/AccessToken", (req, res) => {
+//     res.render("accessToken.ejs",{title: siteTitle});
+// });
 
-app.post("/takeAccessToken", (req, res)=>{
-    access_token = req.body.access_token
-    //get the list of courses associated w/ the access token
-    let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
-    const response = fetch(courses_url)
-        .then(response => response.json())
-        .then(data => {
-            //create a table with (PK = (email, course id))
-            //create a table for each course (PK = course ID, student name, attendance score)
-
-            //parse course data
-            for(let course = 0; course < data.length; course++){
-                if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
-                    console.log('---------- course:',course,'----------')
-                    console.log(data[course]['id'])
-                    console.log(data[course]['name'])
-                    console.log(data[course]['term']['name'])
-                    console.log('')
-                }
-            }
-
-        });
-
-    //get a list of professor courses from the DB using the professor's email
-
-    //use the list of courses (id will be there) to pull a list of students
-    let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
-    fetch(student_list_url).then(response => response.json())
-        .then(data => {
-
-            //parse student data
-            for(let student = 0; student < data.length; student++){
-                if(data[student]['id'] && data[student]['name']){
-                    console.log('\t---------- student:',student,'----------')
-                    console.log('\t',data[student]['id'])
-                    console.log('\t',data[student]['name'])
-                    console.log('')
-                }
-            }
-        });
-
-})
+// app.post("/takeAccessToken", (req, res)=> {
+//     access_token = req.body.access_token
+//     console.log(access_token)
+//
+//     //add access token into prof table
+//     con.query('INSERT INTO sys.professor (access_token) WHERE prof_email == session.userid, VALUES (?)', [access_token])
+//     con.query('UPDATE sys.professor SET access_token = ? WHERE course_id = ?', [access_token, session.userid], function(err, test){
+//         console.log(test)
+//     })
+//
+//     //get the list of courses associated w/ the access token
+//
+//     //get a list of professor courses from the DB using the professor's email
+//     //con.query('SELECT * FROM sys.professor WHERE email = ?', [session.userid], function(error, results, fields){
+//     //     if (error) throw error;
+//     //     //use the list of courses (id will be there) to pull a list of students
+//     //     let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
+//     //     fetch(student_list_url).then(response => response.json())
+//     //         .then(data => {
+//     //             //add the student data into each table
+//     //
+//     //         });
+//     //     })
+// })
