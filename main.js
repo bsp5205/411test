@@ -7,6 +7,7 @@ const require = createRequire(import.meta.url);
 const express = require('express');
 const mysql = require('mysql');
 const path = require("path");
+const sync_fetch = require('sync-fetch')
 const sessions = require('express-session');
 
 const app = express();
@@ -122,6 +123,7 @@ app.post('/test', (req, res) =>{
     //     }
     // })
 
+    //PROBLEM: the db schema is FUCKED
     con.query('SELECT * FROM sys.enrollment WHERE student_email = ?', [parsedEmail], function(error, results, fields){
         if (error) throw error
         if (results.length > 0){
@@ -281,6 +283,9 @@ app.post("/create_prof_account", (req, res) => {
     let password = req.body.prof_pw;
     let password_confirm = req.body.prof_pw_confirm;
     let access_token = req.body.prof_access_token;
+    var id_list = []
+    var student_list = []
+    var enroll_list = []
     console.log(access_token)
     //if the values are defined
     if(email && password && password_confirm){
@@ -292,63 +297,26 @@ app.post("/create_prof_account", (req, res) => {
                 if (error) throw error
                 if (results.length === 0) {
                     con.query('INSERT INTO sys.professor (professor_email, professor_password, access_token) VALUES (?,?,?)', [email, password, access_token])
-                    //render a page that accepts a canvas access token here
-                    //res.render("accessToken.ejs",{title: siteTitle});
                     let courses_url = 'https://canvas.instructure.com/api/v1/courses?access_token={}&per_page=100&include[]=term'.replace('{}', access_token)
-                    const response = fetch(courses_url)
-                        .then(response => response.json())
-                        .then(data => {
-                            //parse course data
-                            for(let course = 0; course < data.length; course++){
-                                if(data[course]['id'] && data[course]['name'] && data[course]['term']['name'].includes(current_term)){
-                                    //create course tables here
-                                    // console.log(data[course]['id'])
-                                    // console.log(data[course]['name'])
-                                    let table_name = 'sys.course_' + String(data[course]['id'])
-                                    con.query("CREATE TABLE ?? (course_id INT PRIMARY KEY, student_id, student_email VARCHAR(255), student_name VARCHAR(255))", [table_name], function (err, result) {
-                                        if (err) throw err;
-                                        console.log("Course table created with name: ", table_name);
-                                    });
-
-                                    // con.query('INSERT INTO ?? (course_id, course_name, prof_email) VALUES (?, ?, ?)', [table_name, data[course]['id'], data[course]['name'], email])
-                                    con.query('INSERT INTO sys.course (course_id, prof_email, course_name, section_number) VALUES (?, ?, ?, ?)', [data[course]['id'], email,  data[course]['name'], 0])
-
+                    const course_api_data = sync_fetch(courses_url, {}).json()
+                    //console.log(course_api_data)
+                    for(let i = 0; i < course_api_data.length; i++){
+                        if(course_api_data[i]['id'] && course_api_data[i]['name'] && course_api_data[i]['term']['name'].includes(current_term)) {
+                            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', course_api_data[i]['id']).replace('{}', access_token)
+                            const student_list_api_data = sync_fetch(student_list_url, {}).json()
+                            for(let j = 0; j < student_list_api_data.length; j++){
+                                //console.log(student_list_api_data[j]['id'], student_list_api_data[j]['name'])
+                                if(!student_list.includes(student_list_api_data[j]['id'])){
+                                    student_list.push(student_list_api_data[j]['id'])
+                                    con.query('INSERT INTO sys.student (student_id, student_name) VALUES (?,?)', [student_list_api_data[j]['id'], student_list_api_data[j]['name']])
+                                }
+                                if(!enroll_list.includes(student_list_api_data[j]['name']+course_api_data[i]['id'])){
+                                    con.query('INSERT INTO sys.enrollment (student_name, course_id) VALUES (?,?)', [student_list_api_data[j]['name'], course_api_data[i]['id']])
+                                    enroll_list.push(student_list_api_data[j]['name']+course_api_data[i]['id'])
                                 }
                             }
-                        });
-                    con.query('SELECT * FROM sys.course WHERE prof_email = ?',[email], function(error, results, fields){
-                        if(error) throw error
-                        for(let i = 0; i < results.length; i++){
-                            let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', results[i]['course_id']).replace('{}', access_token)
-                            fetch(student_list_url).then(response => response.json())
-                                .then(data2 => {
-                                    //add the student data into each table
-                                    for (let j = 0; j < data2.length; j++){
-                                        let table_name = 'sys.course_' + String(results[i]['course_id'])
-                                        con.query('INSERT INTO ?? (course_id, student_id) VALUES (?, ?)', [table_name, results[i]['course_id'], data2[j]['id']])
-                                    }
-                                });
                         }
-                    })
-
-                    //get student emails using canvas profile api and student id
-                    // con.query('SELECT * FROM sys.course WHERE prof_email = ?',[email], function(error, results2, fields){
-                    //     if(error) throw error
-                    //     for(let i = 0; i < results2.length; i++){
-                    //         let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', results2[i]['course_id']).replace('{}', access_token)
-                    //         fetch(student_list_url).then(response => response.json())
-                    //             .then(data3 => {
-                    //                 //add the student data into each table
-                    //                 for (let j = 0; j < data3.length; j++){
-                    //                     let table_name = 'sys.course_' + String(results2[i]['course_id'])
-                    //                     con.query('UPDATE ?? SET student_email = ? WHERE student_id = ?', [table_name, data3[j]['email'], results2[i]['student_id']], function(err, test){
-                    //                         console.log("test")
-                    //                         console.log(test)
-                    //                     })
-                    //                 }
-                    //             });
-                    //     }
-                    // })
+                    }
                 }
             })
         }else{
