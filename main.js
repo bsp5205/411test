@@ -346,6 +346,11 @@ app.get("/updateCourses", (req, res) => {
     res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
 });
 
+app.get("/accessTokenHelp", (req, res) => {
+    res.render("accessTokenHelp.ejs")
+})
+
+
 // app.get("/AccessToken", (req, res) => {
 //     res.render("accessToken.ejs",{title: siteTitle});
 // });
