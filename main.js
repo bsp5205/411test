@@ -77,15 +77,15 @@ app.get("/landing", function(req,res){
 app.post("/codeTest", function(req,res){
     var parsedCode = req.body.codeTest;
     console.log(parsedCode);
-    // con.query('SELECT * FROM sys.course_code where course_id = ?',[temp], function(error, results, fields){
-    //     if(error) throw error
-    //
-    // })
-    if(parsedCode == 5){
-        res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
-    }else{
-        res.render("studentCode.ejs", {title: siteTitle, wrong:"The code you have entered is invalid"})
-    }
+    con.query('SELECT * FROM sys.course where course_code = ?',[parsedCode], function(error, results, fields){
+        if(error) throw error
+        if(results.length > 0){
+            res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
+        }else{
+            res.render("studentCode.ejs", {title: siteTitle, wrong:"The code you have entered is invalid"})
+        }
+    })
+
 })
 
 //database connection
@@ -171,12 +171,16 @@ app.get("/generateCode-:course_id", (req, res) => {
         console.log("code = " + code)
         course_id = course_id.replace(':', '')
         let temp = parseInt(course_id, 10)
-        console.log("course_id = "+ (temp + 1))
+        console.log("course_id = "+ course_id)
         con.query('SELECT * FROM sys.course_code where course_id = ?',[temp], function(error, courses, fields){
             if(error) throw error
             console.log("courses ")
             console.log(courses)
-            con.query('UPDATE sys.course_code SET code =? WHERE course_id =?', [code, course_id], function(err, test){
+            con.query('UPDATE sys.course_code SET code = ? WHERE course_id = ?', [code, course_id], function(err, test){
+                console.log("test ")
+                console.log(test)
+            })
+            con.query('UPDATE sys.course SET course_code = ? WHERE course_id = ?', [code, course_id], function(err, test){
                 console.log("test ")
                 console.log(test)
             })
@@ -218,7 +222,7 @@ app.post("/authentication", (req, res) => {
                 if (results[0]['professor_password'] === password){//check if passwords match then query for courses
                     session = req.session;
                     session.userid = email;
-                    con.query('SELECT * FROM sys.course WHERE professor_email =?', [email], function(error, result, fields){
+                    con.query('SELECT * FROM sys.course WHERE prof_email = ?', [email], function(error, result, fields){
                         console.log(result)
                         let input = [];//set empty array
                         for (let i = 0; i < result.length; i++){//for loop to generate all items in the list of courses
