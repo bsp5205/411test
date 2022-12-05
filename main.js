@@ -105,11 +105,27 @@ con.connect(function(err) {
 app.post('/test', (req, res) =>{
     //get the email from the form
     var parsedEmail = req.body.emailTest;
+    //PROBLEM: course id needed in this endpoint to update attendance in the proper table
+    // con.query('SELECT * FROM sys.temp_table WHERE email = ?', [parsedEmail], function(error, results, fields){
+    //     if (error) throw error
+    //     if (results.length > 0){
+    //         con.query('UPDATE sys.temp_table set attendance = ? WHERE email = ?', [results[0]['attendance'] + 1, results[0]['email']], function(error, update_results, fields){
+    //             if (error) throw error
+    //             console.log('Updated', update_results.affectedRows, 'rows')
+    //             if (update_results.affectedRows > 0){
+    //                 let msg = "Your attendance has been updated to: " + String(results[0]['attendance'] + 1)
+    //                 res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
+    //             }else{
+    //                 res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
+    //             }
+    //         })
+    //     }
+    // })
 
-    con.query('SELECT * FROM sys.temp_table WHERE email = ?', [parsedEmail], function(error, results, fields){
+    con.query('SELECT * FROM sys.enrollment WHERE student_email = ?', [parsedEmail], function(error, results, fields){
         if (error) throw error
         if (results.length > 0){
-            con.query('UPDATE sys.temp_table set attendance = ? WHERE email = ?', [results[0]['attendance'] + 1, results[0]['email']], function(error, update_results, fields){
+            con.query('UPDATE sys.enrollment set attendance_score = ? WHERE student_email = ?', [results[0]['attendance_score'] + 1, results[0]['student_email']], function(error, update_results, fields){
                 if (error) throw error
                 console.log('Updated', update_results.affectedRows, 'rows')
                 if (update_results.affectedRows > 0){
@@ -121,6 +137,7 @@ app.post('/test', (req, res) =>{
             })
         }
     })
+
 });
 
 //this is the endpoint which will be requested by the student when the QR code is scanned
@@ -139,7 +156,7 @@ app.get("/selectClass", (req, res) => {
 app.get("/courseOptions-:course_id", (req, res) => {
     //get the course id from URL
     let course_id = req.params.course_id;
-    session.current_course_id = req.params.course_id
+    var current_course_id = req.params.course_id
     course_id = course_id.replace(':', '');
     console.log(course_id);
     //query DB for students in the course using the course_id
@@ -183,6 +200,15 @@ app.get("/generateCode-:course_id", (req, res) => {
             con.query('UPDATE sys.course SET course_code = ? WHERE course_id = ?', [code, course_id], function(err, test){
                 console.log("test ")
                 console.log(test)
+            })
+            con.query('SELECT * FROM sys.enrollment WHERE course_id = ?', [course_id], function(error, results, fields){
+                if (error) throw error
+                if (results.length > 0){
+                    con.query('UPDATE sys.enrollment set attendance_total = ? WHERE course_id = ?', [results[0]['attendance_score'] + 1, results[0]['attendance_total'] + 1], function(error, update_results, fields){
+                        if (error) throw error
+                        console.log('Updated', update_results.affectedRows, 'rows')
+                    })
+                }
             })
         })
         //update the course-code DB table with the active code using the course_id passed in the URL
