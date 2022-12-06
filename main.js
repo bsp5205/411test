@@ -119,8 +119,8 @@ app.post('/test-:course_id', (req, res) =>{
                 //console.log(update_results)
                 //console.log('Updated', update_results.affectedRows, 'rows')
                 if (update_results.affectedRows > 0){
-                    let msg = "Your attendance has been updated to: " + String(results[0]['attendance'] + 1)
-                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!",course_id:""});
+                    let msg = "Your attendance has been updated to: " + String(results[0]['attendance_score'] + 1) + '/' + String(results[0]['attendance_total'])
+                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:msg,course_id:""});
                 }else{
                     res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid.",course_id:""});
                 }
