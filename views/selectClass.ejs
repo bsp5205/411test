@@ -38,17 +38,40 @@
     .getButtons{
 
     }
+    .large{
+        margin-top: 10%;
+    }
 </style>
-<div class="center-of-page">
-    <h1>Select a course</h1>
-    <div class="classButtons">
-        <table>
-            <% for (let i = 0; i < course_list.length; i++) { %>
-                <tr>
-                    <td><button class="button-style raise" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %> Section <%=course_list[i].section_number%></button></td>
-                </tr>
-            <% } %></table>
-        <button class="button-style raise" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
+<div class="">
+    <div>
+        <section class="gradient-form">
+            <div class="py-5">
+                <div class="row justify-content-center align-items-center">
+                    <div class="card">
+                        <div class="">
+                            <div class="card-body">
+                                <div class="text-center">
+                                    <h1>Current Courses:</h1>
+                                    <hr>
+                                </div>
+                                <div class="">
+                                    <div class="classButtons">
+                                        <table>
+                                            <% for (let i = 0; i < course_list.length; i++) { %>
+                                                <tr>
+                                                    <td><button class="button-style raise large" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %> Section <%=course_list[i].section_number%></button></td>
+                                                </tr>
+                                            <% } %></table>
+                                        <hr>
+                                        <button class="button-style raise large" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 

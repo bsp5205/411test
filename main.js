@@ -151,16 +151,20 @@ app.get("/courseOptions-:course_id", (req, res) => {
     //query DB for students in the course using the course_id
     let input = []
     con.query('SELECT * FROM sys.enrollment WHERE course_id = ?', [course_id], function(error, results, fields){
-        console.log(results)
+        //console.log(results)
         for(let student = 0; student < results.length; student++){
             let test_student =  {student_name: results[student]['student_name'], attendance_score: results[student]['attendance_score'], attendance_total: results[student]['attendance_total']};
             input.push(test_student)
         }
-        course_id = course_id.toString()
-        let test_list_2 = [{id: course_id}]
+        con.query('SELECT * FROM sys.course WHERE course_id = ?', [course_id], function(error, results2, fields){
+            course_id = course_id.toString()
+            console.log(results2[0]['course_name'])
+            let test_list_2 = [{id: course_id, name:results2[0]['course_name']}]
 
-        //render the course with the list of students from the DB
-        res.render("courseOptions.ejs",{title: siteTitle,  student_list: input, course_id_value: test_list_2})
+            //render the course with the list of students from the DB
+            res.render("courseOptions.ejs",{title: siteTitle,  student_list: input, course_id_value: test_list_2})
+        })
+
     })
 })
 
