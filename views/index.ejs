@@ -27,7 +27,7 @@
     <!-- Form and submission -->
     <div class="flex-container">
       <div class="size">
-        <form action="http://localhost:3000/test" method="post">
+        <form action="http://localhost:3000/test-:<%= course_id %>" method="post">
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">
@@ -48,7 +48,7 @@
                   <%}%>
               </span>
             </div>
-            <input type="email" id="emailTest" name="emailTest" class="form-control" placeholder="Email" aria-label="Username" aria-describedby="basic-addon1" required>
+            <input type="text" id="nameTest" name="nameTest" class="form-control" placeholder="Email" aria-label="Username" aria-describedby="basic-addon1" required>
           </div>
           <div class="text-center">
             <button type="submit" class="button-style">Submit</button>

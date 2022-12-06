@@ -63,7 +63,7 @@ app.get("/login", function(req,res){
 
 //student endpoint
 app.get("/student", function(req,res){
-    res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
+    res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:"", course_id:""});
 });
 
 app.get("/studentCode", function(req,res){
@@ -77,11 +77,12 @@ app.get("/landing", function(req,res){
 
 app.post("/codeTest", function(req,res){
     var parsedCode = req.body.codeTest;
-    console.log(parsedCode);
+
     con.query('SELECT * FROM sys.course where course_code = ?',[parsedCode], function(error, results, fields){
+
         if(error) throw error
         if(results.length > 0){
-            res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:""});
+            res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage:"", course_id:results[0]['course_id']});
         }else{
             res.render("studentCode.ejs", {title: siteTitle, wrong:"The code you have entered is invalid"})
         }
@@ -103,38 +104,25 @@ con.connect(function(err) {
 });
 
 //this endpoint is connected to the form in the attendance page. It gets the student email, checks if it is in the course DB, and then updates the attendance
-app.post('/test', (req, res) =>{
+app.post('/test-:course_id', (req, res) =>{
     //get the email from the form
-    var parsedEmail = req.body.emailTest;
-    //PROBLEM: course id needed in this endpoint to update attendance in the proper table
-    // con.query('SELECT * FROM sys.temp_table WHERE email = ?', [parsedEmail], function(error, results, fields){
-    //     if (error) throw error
-    //     if (results.length > 0){
-    //         con.query('UPDATE sys.temp_table set attendance = ? WHERE email = ?', [results[0]['attendance'] + 1, results[0]['email']], function(error, update_results, fields){
-    //             if (error) throw error
-    //             console.log('Updated', update_results.affectedRows, 'rows')
-    //             if (update_results.affectedRows > 0){
-    //                 let msg = "Your attendance has been updated to: " + String(results[0]['attendance'] + 1)
-    //                 res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
-    //             }else{
-    //                 res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
-    //             }
-    //         })
-    //     }
-    // })
+    var passed_name = req.body.nameTest;
+    let course_id = req.params.course_id
+    course_id = course_id.replace(':', '');
 
-    //PROBLEM: the db schema is FUCKED
-    con.query('SELECT * FROM sys.enrollment WHERE student_email = ?', [parsedEmail], function(error, results, fields){
+    con.query('SELECT * FROM sys.enrollment WHERE course_id = ? AND student_name = ?', [course_id, passed_name], function(error, results, fields){
+        //console.log(results)
         if (error) throw error
         if (results.length > 0){
-            con.query('UPDATE sys.enrollment set attendance_score = ? WHERE student_email = ?', [results[0]['attendance_score'] + 1, results[0]['student_email']], function(error, update_results, fields){
+            con.query('UPDATE sys.enrollment set attendance_score = ? WHERE student_name = ? AND course_id = ?', [results[0]['attendance_score'] + 1, results[0]['student_name'], results[0]['course_id']], function(error, update_results, fields){
                 if (error) throw error
-                console.log('Updated', update_results.affectedRows, 'rows')
+                //console.log(update_results)
+                //console.log('Updated', update_results.affectedRows, 'rows')
                 if (update_results.affectedRows > 0){
                     let msg = "Your attendance has been updated to: " + String(results[0]['attendance'] + 1)
-                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!"});
+                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"success",responseMessage:"Your attendance has been recorded!",course_id:""});
                 }else{
-                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid."});
+                    res.render("index", {title:siteTitle, message:tempMessage,envelope:"failure",responseMessage:"The email you have entered is invalid.",course_id:""});
                 }
             })
         }
@@ -147,37 +135,33 @@ app.get("/attendance-:code", (req, res) => {
     //get the code passed in the URL
     let code = req.params.code
     //render the page with the code (for testing/demo)
-    res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage: "The code you entered is"+code});
+    res.render("index", {title:siteTitle, message:tempMessage,envelope:"default",responseMessage: "The code you entered is"+code, course_id:""});
 });
 
 app.get("/selectClass", (req, res) => {
     res.render("selectClass.ejs",{title: siteTitle});
-})
+});
 
 //this endpoint will query the DB for the specified course and pass a list of students to the front end
 app.get("/courseOptions-:course_id", (req, res) => {
     //get the course id from URL
     let course_id = req.params.course_id;
-    var current_course_id = req.params.course_id
     course_id = course_id.replace(':', '');
-    console.log(course_id);
+    //console.log(course_id);
     //query DB for students in the course using the course_id
+    let input = []
+    con.query('SELECT * FROM sys.enrollment WHERE course_id = ?', [course_id], function(error, results, fields){
+        console.log(results)
+        for(let student = 0; student < results.length; student++){
+            let test_student =  {student_name: results[student]['student_name'], attendance_score: results[student]['attendance_score'], attendance_total: results[student]['attendance_total']};
+            input.push(test_student)
+        }
+        course_id = course_id.toString()
+        let test_list_2 = [{id: course_id}]
 
-    //test_list is filled w/ dummy data to test the table generation
-    let test_list = [];
-    if(course_id === '00001'){
-        test_list = [{student_name: 'TestName1', student_attendance: '2/10'}, {student_name: 'TestName2', student_attendance: '9/10'}];
-    }else if (course_id === '00002'){
-        test_list = [{student_name: 'TestName3', student_attendance: '5/10'}, {student_name: 'TestName4', student_attendance: '0/10'}];
-    }else if (course_id === '00003'){
-        test_list = [{student_name: 'TestName5', student_attendance: '1/10'}, {student_name: 'TestName6', student_attendance: '7/10'}];
-    }
-
-    course_id = course_id.toString()
-
-    let test_list_2 = [{id: course_id}]
-    //render the course with the list of students from the DB
-    res.render("courseOptions.ejs",{title: siteTitle,  student_list: test_list, course_id_value: test_list_2})
+        //render the course with the list of students from the DB
+        res.render("courseOptions.ejs",{title: siteTitle,  student_list: input, course_id_value: test_list_2})
+    })
 })
 
 //this endpoint will generate the QR code using the API and then pass the image to the front end
@@ -185,7 +169,6 @@ app.get("/generateCode-:course_id", (req, res) => {
     if(session){ //check if session is defined - if yes, then the professor is logged in
         let course_id = req.params.course_id;
         let code = Math.floor(100000 + Math.random() * 900000);
-
         //generate the code
         console.log("code = " + code)
         course_id = course_id.replace(':', '')
@@ -193,28 +176,28 @@ app.get("/generateCode-:course_id", (req, res) => {
         console.log("course_id = "+ course_id)
         con.query('SELECT * FROM sys.course_code where course_id = ?',[temp], function(error, courses, fields){
             if(error) throw error
-            console.log("courses ")
-            console.log(courses)
+            //console.log("courses ")
+            //console.log(courses)
             con.query('UPDATE sys.course_code SET code = ? WHERE course_id = ?', [code, course_id], function(err, test){
-                console.log("test ")
-                console.log(test)
+                //console.log("test ")
+                //console.log(test)
             })
             con.query('UPDATE sys.course SET course_code = ? WHERE course_id = ?', [code, course_id], function(err, test){
-                console.log("test ")
-                console.log(test)
+                //console.log("test ")
+                //console.log(test)
             })
             con.query('SELECT * FROM sys.enrollment WHERE course_id = ?', [course_id], function(error, results, fields){
+                //console.log(results)
                 if (error) throw error
                 if (results.length > 0){
-                    con.query('UPDATE sys.enrollment set attendance_total = ? WHERE course_id = ?', [results[0]['attendance_score'] + 1, results[0]['attendance_total'] + 1], function(error, update_results, fields){
-                        if (error) throw error
-                        console.log('Updated', update_results.affectedRows, 'rows')
-                    })
+                    for(let result = 0; result < results.length; result++){
+                        con.query('UPDATE sys.enrollment set attendance_total = ? WHERE student_name = ? AND course_id = ?', [results[result]['attendance_total'] + 1, results[result]['student_name'], results[result]['course_id']], function(error, update_results, fields){
+                            if (error) throw error
+                        })
+                    }
                 }
             })
         })
-        //update the course-code DB table with the active code using the course_id passed in the URL
-
         //QR code api call
         const userAction = async () => {
             const response = await fetch('https://api.qrserver.com/v1/create-qr-code/?data={}&size=200x200'.replace('{}','http://localhost:3000/' + code));
@@ -245,13 +228,13 @@ app.post("/authentication", (req, res) => {
     if (email && password){//if an email and password are entered query for email in the DB
         con.query('SELECT * FROM sys.professor WHERE professor_email = ?', [email], function(error, results, fields){
             if (error) throw error
-            console.log(results)
+            //console.log(results)
             if (results.length > 0){//if the DB returns anything
                 if (results[0]['professor_password'] === password){//check if passwords match then query for courses
                     session = req.session;
                     session.userid = email;
                     con.query('SELECT * FROM sys.course WHERE prof_email = ?', [email], function(error, result, fields){
-                        console.log(result)
+                        //console.log(result)
                         let input = [];//set empty array
                         for (let i = 0; i < result.length; i++){//for loop to generate all items in the list of courses
                             let test =  {course_name: result[i]['course_name'], course_id: result[i]['course_id'], section_number: result[i]['section_number']};
@@ -302,6 +285,7 @@ app.post("/create_prof_account", (req, res) => {
                     //console.log(course_api_data)
                     for(let i = 0; i < course_api_data.length; i++){
                         if(course_api_data[i]['id'] && course_api_data[i]['name'] && course_api_data[i]['term']['name'].includes(current_term)) {
+                            con.query('INSERT INTO sys.course (course_id, prof_email, course_name, section_number) VALUES (?,?)', [course_api_data[i]['id'], email, course_api_data[i]['name'], 0])
                             let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', course_api_data[i]['id']).replace('{}', access_token)
                             const student_list_api_data = sync_fetch(student_list_url, {}).json()
                             for(let j = 0; j < student_list_api_data.length; j++){
@@ -347,33 +331,3 @@ app.get("/updateCourses", (req, res) => {
 app.get("/accessTokenHelp", (req, res) => {
     res.render("accessTokenHelp.ejs")
 })
-
-
-// app.get("/AccessToken", (req, res) => {
-//     res.render("accessToken.ejs",{title: siteTitle});
-// });
-
-// app.post("/takeAccessToken", (req, res)=> {
-//     access_token = req.body.access_token
-//     console.log(access_token)
-//
-//     //add access token into prof table
-//     con.query('INSERT INTO sys.professor (access_token) WHERE prof_email == session.userid, VALUES (?)', [access_token])
-//     con.query('UPDATE sys.professor SET access_token = ? WHERE course_id = ?', [access_token, session.userid], function(err, test){
-//         console.log(test)
-//     })
-//
-//     //get the list of courses associated w/ the access token
-//
-//     //get a list of professor courses from the DB using the professor's email
-//     //con.query('SELECT * FROM sys.professor WHERE email = ?', [session.userid], function(error, results, fields){
-//     //     if (error) throw error;
-//     //     //use the list of courses (id will be there) to pull a list of students
-//     //     let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', '10500000002193258').replace('{}',access_token)
-//     //     fetch(student_list_url).then(response => response.json())
-//     //         .then(data => {
-//     //             //add the student data into each table
-//     //
-//     //         });
-//     //     })
-// })
