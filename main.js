@@ -289,7 +289,7 @@ app.post("/create_prof_account", (req, res) => {
                     //console.log(course_api_data)
                     for(let i = 0; i < course_api_data.length; i++){
                         if(course_api_data[i]['id'] && course_api_data[i]['name'] && course_api_data[i]['term']['name'].includes(current_term)) {
-                            con.query('INSERT INTO sys.course (course_id, prof_email, course_name, section_number) VALUES (?,?)', [course_api_data[i]['id'], email, course_api_data[i]['name'], 0])
+                            con.query('INSERT INTO sys.course (course_id, prof_email, course_name, section_number) VALUES (?,?,?,?)', [course_api_data[i]['id'], email, course_api_data[i]['name'], 0])
                             let student_list_url = 'https://canvas.instructure.com/api/v1/courses/{}/students/?access_token={}&per_page=100'.replace('{}', course_api_data[i]['id']).replace('{}', access_token)
                             const student_list_api_data = sync_fetch(student_list_url, {}).json()
                             for(let j = 0; j < student_list_api_data.length; j++){
@@ -315,21 +315,6 @@ app.post("/create_prof_account", (req, res) => {
         //render the creation page if the passwords don't match
         res.render("create.ejs",{title: siteTitle, message: "Missing information"});
     }
-});
-
-//allows prof to manually update the courses
-app.get("/updateCourses", (req, res) => {
-    // get list of prof courses from DB
-    if(session.userid){
-        con.query('SELECT * FROM sys.professor WHERE professor_email = session.userid', function(error, results, fields){
-            if (error) throw error;
-        });
-    }
-    // use the canvas API to pull a list of students from each course
-
-    // temp list
-    let prof_course_list = [{course_name: 'Course 1', course_id: '00001'}, {course_name: 'Course 2', course_id: '00002'}, {course_name: 'Course 3', course_id: '00003'}];
-    res.render("selectClass.ejs",{title: siteTitle, course_list: prof_course_list});
 });
 
 app.get("/accessTokenHelp", (req, res) => {

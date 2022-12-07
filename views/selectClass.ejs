@@ -41,6 +41,16 @@
     .large{
         margin-top: 10%;
     }
+    .block {
+        display: block;
+        width: 100%;
+        border: none;
+        background-color: #04AA6D;
+        padding: 14px 28px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+    }
 </style>
 <div class="">
     <div>
@@ -59,11 +69,10 @@
                                         <table>
                                             <% for (let i = 0; i < course_list.length; i++) { %>
                                                 <tr>
-                                                    <td><button class="button-style raise large" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %> Section <%=course_list[i].section_number%></button></td>
+                                                    <td><button class="button-style raise large block" onclick="window.location.href = 'http://localhost:3000/courseOptions-:<%= course_list[i]['course_id'] %>'"><%= course_list[i].course_name %> Section <%=course_list[i].section_number%></button></td>
                                                 </tr>
                                             <% } %></table>
                                         <hr>
-                                        <button class="button-style raise large" onclick="window.location.href = 'http://localhost:3000/updateCourses'">Update Courses</button>
                                     </div>
                                 </div>
                             </div>
