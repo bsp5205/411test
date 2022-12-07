@@ -43,6 +43,12 @@
     .button-padding2{
         padding-top: 3%;
     }
+    .wrapper{
+        display: inline;
+    }
+    .pad{
+        padding-top: 2%;
+    }
 </style>
 <script>
     function tableToCSV() {
@@ -122,55 +128,58 @@
         win.print();    // PRINT THE CONTENTS.
     }
 </script>
-        <div style="height: 180%">
-            <section class="h-100 gradient-form">
-                <div class="py-5 h-100">
-                    <div class="row justify-content-center align-items-center h-100">
-                        <div class="card">
-                            <div class="">
-                                <div class="card-body">
-                                    <div class="text-center">
-                                        <h1 id="getCode" style="display: none"><%= course_id_value[0].id %></h1>
-                                        <h1><%= course_id_value[0].name %></h1>
-                                    </div>
-                                    <hr>
-                                    <div class="center-of-page">
-                                        <div id="tab">
-                                            <table class="paddingBetweenCols">
-                                                <tr>
-                                                    <td><b>Name</b></td>
-                                                    <td class="student_table"></td>
-                                                    <td class="student_table"></td>
-                                                    <td><b>Attendance Score</b></td>
-                                                </tr>
-                                                <% for (var i = 0; i < student_list.length; i++) { %>
-                                                    <tr>
-                                                        <td><%= student_list[i].student_name %></td>
-                                                        <td class="student_table"></td>
-                                                        <td class="student_table"></td>
-                                                        <td><%= student_list[i].attendance_score%>/<%= student_list[i].attendance_total%></td>
-                                                    </tr>
-                                                <% } %></table>
-                                        </div>
-                                        <hr>
-                                        <center class="button-padding">
-                                            <div>
-                                                <button class="button-style raise " onclick="window.location.href = 'http://localhost:3000/generateCode-:<%= course_id_value[0].id %>'">Generate QR Code</button>
-                                            </div>
-
-                                            <div class="button-padding2">
-                                                <button class="button-style raise" onclick="tableToCSV()">Generate Attendance Report (.xlsx)</button>
-                                                <button class="button-style raise" onclick="createPDF()">Generate Attendance Report (.pdf)</button>
-                                            </div>
-                                        </center>
-
-                                    </div>
+<div class="wrapper">
+    <section class="h-100 gradient-form">
+        <div class="py-5 h-100" >
+            <div class="row justify-content-center align-items-center">
+                <div class="card">
+                    <div class="">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h1 id="getCode" style="display: none"><%= course_id_value[0].id %></h1>
+                                <h1><%= course_id_value[0].name %></h1>
+                            </div>
+                            <hr>
+                            <div class="center-of-page">
+                                <div id="tab">
+                                    <table class="paddingBetweenCols">
+                                        <tr>
+                                            <td><b>Name</b></td>
+                                            <td class="student_table"></td>
+                                            <td class="student_table"></td>
+                                            <td><b>Attendance Score</b></td>
+                                        </tr>
+                                        <% for (var i = 0; i < student_list.length; i++) { %>
+                                            <tr>
+                                                <td><%= student_list[i].student_name %></td>
+                                                <td class="student_table"></td>
+                                                <td class="student_table"></td>
+                                                <td><%= student_list[i].attendance_score%>/<%= student_list[i].attendance_total%></td>
+                                            </tr>
+                                        <% } %></table>
                                 </div>
+                                <hr>
+                                <center class="button-padding">
+                                    <div>
+                                        <button class="button-style raise " onclick="window.location.href = 'http://localhost:3000/generateCode-:<%= course_id_value[0].id %>'">Generate QR Code</button>
+                                    </div>
+
+                                    <div class="button-padding2">
+                                        <button class="button-style raise" onclick="tableToCSV()">Generate Attendance Report (.xlsx)</button>
+                                        <button class="button-style raise" onclick="createPDF()">Generate Attendance Report (.pdf)</button>
+                                    </div>
+                                </center>
+
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+            <div class="pad">
+                <%- include('footer.ejs') %>
+
+            </div>
         </div>
-</html>
-<%- include('footer.ejs') %>
+    </section>
+</div>
+
