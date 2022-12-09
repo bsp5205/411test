@@ -1,0 +1,139 @@
+<%- include('head.ejs') %>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<style>
+    .padding-sides{
+        padding-left: 5%;
+        padding-right: 5%;
+        padding-bottom: 2%;
+    }
+    .flex-container-left {
+        display: flex;
+        justify-content: left;
+    }
+    .size{
+        width: 50%;
+    }
+    .header-thickness{
+        height: 15%;
+    }
+    .logo-thickness{
+        height: 50%;
+    }
+    .help-button{
+        width: 3vw;
+        height: 3vw;
+        border-radius: 50% !important;
+
+    }
+    .help-button-div{
+        height: 75%;
+    }
+    .mat-card{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-image: linear-gradient(to right, #009cde, #001c3f);
+    }
+    .brand{
+        position: relative;
+        margin-left: 15%;
+        margin-right: 15%;
+    }
+    .button-style{
+        background-image: linear-gradient(#009adc, #1e427e);
+        border: none
+    }
+    .button-style:hover {
+        box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+    }
+</style>
+<div class="wrapper">
+    <section class="h-100 gradient-form">
+        <div class="py-5 h-100" >
+            <div class="row justify-content-center align-items-center padding-sides">
+                <div class="card">
+                    <div class="">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h3 class="text-center mb-4 pb-2 text-primary fw-bold">FAQ</h3>
+                                <p class="text-center mb-5">
+                                    Find the answers for the most frequently asked questions below
+                                </p>
+                            </div>
+                            <hr>
+                            <div class="center-of-page">
+                                <div id="tab">
+                                    <div class="row">
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i> What is a QR code?</h6>
+                                            <p>
+                                                A machine-readable code consisting of an array of black and white squares,
+                                                typically used for storing URLs or other information for reading by the camera on a smartphone.
+                                            </p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i> What is an API?</h6>
+                                            <p>
+                                                An application programming interface is a way for two or more computer programs to communicate with each other.
+                                                It is a type of software interface, offering a service to other pieces of software.
+                                            </p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> How does LionTrack work?
+                                            </h6>
+                                            <p>
+                                                The app combines embeds an endpoint URL with a random 6-digit number into a
+                                                QR code which links to the attendance submission page when the code is scanned.
+                                            </p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> What is the point of this app?
+                                            </h6>
+                                            <p>
+                                                Roll call or passing around a sign-in sheet is typically time-consuming or can result in students missing important information.
+                                                This app makes attendance tracking more efficient for Penn State faculty by automatically recording and tracking attendance.
+                                            </p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> Where does the list of students come from?
+                                            </h6>
+                                            <p>
+                                                The app will use the provided access token at account creation to pull a list of courses and associated students.
+                                                 These courses and students will be stored in an SQL database and will be pulled when viewing each course.
+                                            </p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-4 mb-4">
+                                            <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i> What if a student forgets a smart device?
+                                            </h6>
+                                            <p>
+                                                The 6-digit code is displayed along with the QR code. The student may write down this code and input
+                                                it into the website up to an hour after class ends to be taken to the name submission page.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pad">
+                <%- include('footer.ejs') %>
+            </div>
+        </div>
+    </section>
+</div>
+<section>
+
+
+
+</section>
