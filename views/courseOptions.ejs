@@ -35,7 +35,7 @@
         margin-left: 20px;
     }
     .paddingBetweenCols td {
-        padding: 0 15px;
+        padding: 0 100px;
     }
     .button-padding{
         padding-top: 5%;
@@ -48,6 +48,12 @@
     }
     .pad{
         padding-top: 2%;
+    }
+    .pad2 {
+        padding: 2%;
+    }
+    td {
+        padding: 15px 15px;
     }
 </style>
 <script>
@@ -141,23 +147,22 @@
                             </div>
                             <hr>
                             <div class="center-of-page">
-                                <div id="tab">
-                                    <table class="paddingBetweenCols">
-                                        <tr>
-                                            <td><b>Name</b></td>
-                                            <td class="student_table"></td>
-                                            <td class="student_table"></td>
-                                            <td><b>Attendance Score</b></td>
-                                        </tr>
-                                        <% for (var i = 0; i < student_list.length; i++) { %>
+                                <center>
+                                    <div id="tab">
+                                        <table class="paddingBetweenCols">
                                             <tr>
-                                                <td><%= student_list[i].student_name %></td>
-                                                <td class="student_table"></td>
-                                                <td class="student_table"></td>
-                                                <td><%= student_list[i].attendance_score%>/<%= student_list[i].attendance_total%></td>
+                                                <td><b>Name</b></td>
+                                                <td><b>Attendance Score</b></td>
                                             </tr>
-                                        <% } %></table>
-                                </div>
+                                            <% for (var i = 0; i < student_list.length; i++) { %>
+                                                <tr>
+                                                    <td><%= student_list[i].student_name %></td>
+                                                    <td><%= student_list[i].attendance_score%>/<%= student_list[i].attendance_total%></td>
+                                                </tr>
+                                            <% } %></table>
+                                    </div>
+                                </center>
+
                                 <hr>
                                 <center class="button-padding">
                                     <div>
